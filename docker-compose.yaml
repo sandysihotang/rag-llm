@@ -1,5 +1,4 @@
-name: rag-llm
-version: "5"
+version: "3.8"
 services:
   timescaledb:
     image: timescale/timescaledb-ha:pg16

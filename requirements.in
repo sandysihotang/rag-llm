@@ -1,6 +1,4 @@
-flask
 requests
-torch
 spacy
 pandas
 frontend

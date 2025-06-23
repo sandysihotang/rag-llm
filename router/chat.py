@@ -1,4 +1,3 @@
-from http.client import NOT_FOUND
 import os
 from fastapi import APIRouter, Body, File, HTTPException, Request, UploadFile, status
 from fastapi.responses import JSONResponse
