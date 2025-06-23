@@ -2,7 +2,6 @@ requests
 spacy
 pandas
 frontend
-tools
 pymupdf
 OpenAI
 fastapi

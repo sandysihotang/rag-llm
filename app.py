@@ -10,9 +10,7 @@ app = FastAPI()
 app.add_middleware(JWTAuthMiddleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-    "https://fe-rag-llm.vercel.app",  # Add the allowed domain here
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
