@@ -4,7 +4,6 @@ pandas
 frontend
 tools
 pymupdf
-sentence_transformers
 OpenAI
 fastapi
 python-multipart
