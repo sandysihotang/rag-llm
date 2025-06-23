@@ -43,7 +43,6 @@ class OpenConnectionDB():
         pass
         
     def ConnectDB(self):
-        print(f'{os.getenv(key=Const().DB_URL)}')
         self.URL = os.getenv(key=Const().DB_URL)
         conn = create_engine(self.URL)
         session = sessionmaker(autocommit= False, autoflush = False, bind=conn)
