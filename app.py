@@ -4,10 +4,10 @@ from fastapi.responses import JSONResponse
 import uvicorn
 from router import chat, users
 from router.middleware.middleware import JWTAuthMiddleware
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.jobstores.memory import MemoryJobStore
-from data.config.settings import Settings
-from src.services.document_service import DocumentService
+# from apscheduler.schedulers.asyncio import AsyncIOScheduler
+# from apscheduler.jobstores.memory import MemoryJobStore
+# from data.config.settings import Settings
+# from src.services.document_service import DocumentService
 
 
 # settings = Settings()
