@@ -35,8 +35,8 @@ services:
       - "80:80"    # Expose HTTP port for redirection
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-      - ./nginx-selfsigned.crt:/etc/ssl/certs/nginx-selfsigned.crt  # Mount your certificates
-      - ./nginx-selfsigned.key:/etc/ssl/private/nginx-selfsigned.key
+      - ./certs/nginx-selfsigned.crt:/etc/ssl/certs/nginx-selfsigned.crt  # Mount your certificates
+      - ./certs/nginx-selfsigned.key:/etc/ssl/private/nginx-selfsigned.key
     depends_on:
       - fastapi-app
     networks:
