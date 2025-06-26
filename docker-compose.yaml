@@ -13,38 +13,6 @@ services:
     restart: unless-stopped
 
 
-  # nsqlookupd:
-  #   container_name: nsqlookupd
-  #   command: /nsqlookupd
-  #   image: nsqio/nsq
-  #   ports:
-  #     - 4160:4160
-  #     - 4161:4161
-  #   networks:
-  #     - nsq-network
-
-  # nsqd:
-  #   container_name: nsqd
-  #   command: /nsqd --broadcast-address=nsqd --lookupd-tcp-address=nsqlookupd:4160
-  #   depends_on:
-  #     - nsqlookupd
-  #   image: nsqio/nsq:latest
-  #   ports:
-  #     - 4150:4150
-  #     - 4151:4151
-  #   networks:
-  #     - nsq-network
-  #   #Don’t forget to add nsqd as 127.0.0.1 at your /etc/hosts
-  # nsqadmin:
-  #   container_name: nsqadmin
-  #   command: /nsqadmin --lookupd-http-address=nsqlookupd:4161
-  #   depends_on:
-  #     - nsqlookupd
-  #   image: nsqio/nsq
-  #   ports:
-  #     - 4171:4171
-  #   networks:
-  #     - nsq-network
   
   fastapi-app:
     build: .
