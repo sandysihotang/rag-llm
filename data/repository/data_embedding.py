@@ -21,7 +21,7 @@ class data_embedding():
         SELECT e.id, e.page_number, f.original_file_name, e.type_source, e.sentence_chunk, e.embedding_data <=> CAST(:query_vector as vector) as similarity_scores, f.type_data
         FROM embedding e inner join files f on e.files_id = f.id
         WHERE f.user_id = :user_id
-        ORDER BY embedding_data <=> CAST(:query_vector as vector)
+        ORDER BY similarity_scores
         LIMIT 5
         """),
         {'query_vector': query, 'user_id': user_id}  # Bind the query_vector parameter
