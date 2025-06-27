@@ -141,6 +141,7 @@ class RagModel():
             new_chat_user = ChatHistory(user_id=user_id, messages= query, messages_from= 1, create_time=datetime.now())
             ChatHistoryRepository.insert_new_chat(self.session, new_chat_user)
         except Exception as e:
+            self.session.rollback()
             raise e
         self.chat_gpt_client = OpenAI(api_key=self.api_key)
 
@@ -171,6 +172,7 @@ class RagModel():
             new_chat_bot = ChatHistory(user_id=user_id, messages= output_text, messages_from= 2, reference= reference, create_time=datetime.now(), context_answer= '- ' + '\n- '.join([item['sentence_chunk'] for item in similarity_data]))
             data = ChatHistoryRepository.insert_new_chat(self.session, new_chat_bot)
         except Exception as e:
+            self.session.rollback()
             raise e
         
         self.session.commit()
@@ -191,6 +193,7 @@ class RagModel():
             
             return JSONResponse(status_code=200, content=f'file {filename} uploaded succesfully')
         else:
+            self.session.rollback()
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='File type not allowed')
     
     def allowed_file(self, filename):
@@ -242,4 +245,5 @@ class RagModel():
             
             return JSONResponse(status_code=200, content=f'{title} Processing')
         except Exception as e:
+            self.session.rollback()
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail= f'e')

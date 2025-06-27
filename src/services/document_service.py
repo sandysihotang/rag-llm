@@ -120,6 +120,7 @@ class DocumentService:
             try:
                 os.remove(path=os.path.join(self.file_upload_dir,data.file_name))  # Delete the file
             except Exception as e:
+                self.session.rollback()
                 print(f"Error occurred while deleting the file: {e}")
                 raise
         self.session.commit()
