@@ -72,7 +72,7 @@ class RagModel():
         )
         return dataEmbedding.data[0].embedding
 
-    def prompt_formatter(self, query: str, history_chat: list ,context_items):
+    def prompt_formatter(self, query: str, history_chat:list ,context_items):
         context = '- ' + '\n- '.join([item['sentence_chunk'] for item in context_items])
         base_prompt = """
             # Role and Purpose
@@ -91,16 +91,16 @@ class RagModel():
 
             Remember: Your goal is to be as helpful as possible while strictly adhering to the provided context and history.
 
-            Please review the question and relevant context before responding:
-
-            Question: {query}
-            Retrieved Information:
-            {context}
+            Please review the question and relevant context before responding!!!
             """
-        prompt = base_prompt.format(context=context,query=query)
+        
         history_chat.append({
             'role': 'user',
-            'content': prompt
+            'content': f'Context: {context}, Question: {query}'
+        })
+        history_chat.append({
+            'role': 'system',
+            'content': base_prompt
         })
         return history_chat
 
@@ -112,22 +112,21 @@ class RagModel():
         except Exception as e:
             raise HTTPException(status_code=400, detail=e)
     def generate_history_message(self, history_chat: list[ChatHistory]):
-        history_chat = []
+        history_chats = []
         for i in range(len(history_chat)-1, -1, -1):
             item = history_chat[i]
             if item.messages_from == 1:
-                history_chat.append({
+                history_chats.append({
                     'role': 'user',
                     'content': item.messages
                 })
-                history_chat = f'USER: {item.messages}\n'
             else:
                 context_if_exist = f'{"Context answer: " if len(item.context_answer) != 0 else ""} {item.context_answer}'
-                history_chat.append({
-                    'role': 'system',
+                history_chats.append({
+                    'role': 'assistant',
                     'content': f'{item.messages}\n\n{context_if_exist}'
                 })
-        return history_chat
+        return history_chats
     def ask(self,query,user_id: int, format_answer_text=True,return_answer_only=True):
         embedding = self.getVectorData(query)
         

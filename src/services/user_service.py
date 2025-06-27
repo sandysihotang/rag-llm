@@ -40,7 +40,6 @@ class UserService():
                 return False, 0
             fernet = Fernet(self.key_password)
             decrypt_password = fernet.decrypt(user.password).decode()
-            print(f'{password} password  {decrypt_password} decrypt_password')
             return password==decrypt_password, user.id
         except Exception as e:
             print(f'Error: {e}')
