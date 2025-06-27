@@ -12,7 +12,6 @@ CREATE TABLE public.embedding (
 	update_time timestamptz DEFAULT now() NOT NULL,
 	CONSTRAINT embedding_pkey PRIMARY KEY (id)
 );
-CREATE INDEX ON embedding USING hnsw (embedding_data vector_l1_ops);
 CREATE TABLE public.files (
     id bigserial not NULL,
     user_id int,

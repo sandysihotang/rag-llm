@@ -135,10 +135,6 @@ class DocumentService:
     def split_list(self, input_list:list[str], slice_size:int=10):
         return [input_list[i:i+slice_size] for i in range (0, len(input_list), slice_size)]
     
-    
-    
-    
-    
     def process_file_txt(self, filedata:Files, min_token_length=30,num_sentence_chunk_size=10):
         filepath = os.path.join(self.file_upload_dir,filedata.file_name)
         with open(filepath,'r') as f:
