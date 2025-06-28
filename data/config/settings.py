@@ -4,7 +4,7 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 # import tornado.options
-
+from sqlalchemy.pool import QueuePool
 from data.constant import Const
 from dotenv import load_dotenv
 load_dotenv(dotenv_path='./.env')
@@ -41,7 +41,11 @@ class OpenAISettings:
 class OpenConnectionDB():
     def __init__(self):
         self.URL = os.getenv(key=Const().DB_URL)
-        conn = create_engine(self.URL, echo=False)
+        conn = create_engine(self.URL, echo=False,poolclass=QueuePool,  
+                             pool_size=5,  
+                             max_overflow=10,  
+                             pool_timeout=30,  
+                             pool_recycle=3600)
         self.session = sessionmaker(autocommit= False, autoflush = False, bind=conn)
         
     def ConnectDB(self)->Session:

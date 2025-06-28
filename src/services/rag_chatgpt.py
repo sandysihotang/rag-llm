@@ -87,8 +87,7 @@ class RagModel():
             6. If the question has related previous content, incorporate it into the current answer for completeness.
             7. Maintain a helpful, professional, and polite tone throughout your response.
             8. Ensure your response is helpful, staying faithful to the provided information without speculating.
-            9. If the query language submitted is different from the document provided, respond in the same language as the query.
-            10. When referencing the provided document and page (if available), give the answer with the document and page number from the context, and write your the document and pages at the bottom.
+            9. When referencing the provided document and page (if available), give the answer with the document and page number from the context, and write your the document and pages at the bottom.
 
             Remember: Your goal is to be as helpful as possible while strictly adhering to the provided context and history.
 
