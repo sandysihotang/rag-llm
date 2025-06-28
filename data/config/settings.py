@@ -2,7 +2,7 @@ import os
 # from nsq import Writer
 # import nsq
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 # import tornado.options
 
 from data.constant import Const
@@ -24,7 +24,7 @@ class Settings:
         return self.key_password
     
     def getConnectionDB(self): 
-        return self.ConnDB.ConnectDB()
+        return self.ConnDB.ConnectDB
     
     # def getNSQConnection(self):
     #     return self.nsq.ConnectNSQ()
@@ -40,15 +40,14 @@ class OpenAISettings:
 
 class OpenConnectionDB():
     def __init__(self):
-        pass
-        
-    def ConnectDB(self):
         self.URL = os.getenv(key=Const().DB_URL)
-        conn = create_engine(self.URL, echo=True)
-        session = sessionmaker(autocommit= False, autoflush = False, bind=conn)
-        db = session()
+        conn = create_engine(self.URL, echo=False)
+        self.session = sessionmaker(autocommit= False, autoflush = False, bind=conn)
+        
+    def ConnectDB(self)->Session:
+        db = self.session()
         try:
-           yield db
+            yield db
         finally:
             db.close()
     

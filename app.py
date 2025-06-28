@@ -1,6 +1,8 @@
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from flask import session
+from requests import Session
 import uvicorn
 from router import chat, users
 from router.middleware.middleware import JWTAuthMiddleware
@@ -16,12 +18,14 @@ document_service = DocumentService(settings=settings)
 app = FastAPI()
 scheduler =  AsyncIOScheduler(jobstores={'default':MemoryJobStore()})
 
-@scheduler.scheduled_job('interval', seconds=5)
-def my_scheduler():
-    document_service.process_files()
+
+def job_processing_file():
+    session = next(settings.ConnDB.ConnectDB())
+    document_service.process_files(session)
 
 @app.on_event("startup")
 async def startup_event():
+    scheduler.add_job(job_processing_file,'interval', seconds=5)
     scheduler.start()
 
 @app.on_event("shutdown")

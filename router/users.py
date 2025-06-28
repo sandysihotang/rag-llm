@@ -34,7 +34,7 @@ def generate_token(id: int):
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 @router.post("/login")
-def login(user:User = Body(...), session: Session = Depends(settings.getConnectionDB)): 
+def login(user:User = Body(...), session: Session = Depends(settings.getConnectionDB())): 
     try:
         is_valid, user_id = user_service.get_user(email=user.email, password=user.password, session=session)
         if(is_valid == False):
@@ -46,7 +46,7 @@ def login(user:User = Body(...), session: Session = Depends(settings.getConnecti
         raise HTTPException(status_code=400, detail="Authorization user Failed")
 
 @router.post("/register")
-def register(user:User = Body(...), session: Session = Depends(settings.getConnectionDB)):
+def register(user:User = Body(...), session: Session = Depends(settings.getConnectionDB())):
     try:
         new_user = user_service.register_user(email=user.email, password=user.password, session= session)
         token = generate_token(new_user.id)

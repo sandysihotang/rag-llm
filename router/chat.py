@@ -31,7 +31,7 @@ def get_new_file_name():
 #     model.test_nsq()
 
 @router.post('/send_message')
-def send_message(request: Request,chat: Chat = Body(...), session: Session=Depends(settings.getConnectionDB)):
+def send_message(request: Request,chat: Chat = Body(...), session: Session=Depends(settings.getConnectionDB())):
     user_message = chat.message.lower()
     try:
         data = model.ask(user_message, return_answer_only=False, user_id=request.state.user['id'],session=session)
@@ -40,12 +40,12 @@ def send_message(request: Request,chat: Chat = Body(...), session: Session=Depen
         raise e
 
 @router.get('/history-message')
-def get_history_message(request: Request, session: Session=Depends(settings.getConnectionDB)):
+def get_history_message(request: Request, session: Session=Depends(settings.getConnectionDB())):
     return model.get_history_message(request.state.user['id'], session=session)
 
 
 @router.post('/upload', status_code=status.HTTP_200_OK)
-async def uploads(request: Request,file: UploadFile = File(description="Upload PDF File", media_type="application/pdf"), session: Session=Depends(settings.getConnectionDB)):
+async def uploads(request: Request,file: UploadFile = File(description="Upload PDF File", media_type="application/pdf"), session: Session=Depends(settings.getConnectionDB())):
     content = await file.read()
 
     if not content:
@@ -65,11 +65,11 @@ async def scrape_url(scraping: Scrape = Body(...)):
 
 
 @router.get('/source')
-async def get_source(request: Request, session: Session=Depends(settings.getConnectionDB)):
+async def get_source(request: Request, session: Session=Depends(settings.getConnectionDB())):
     return await model.get_source(request.state.user['id'], session=session)
 
 
 @router.post('/process-data')
-async def process_data_url(request: Request, scraping: Scrape = Body(...), session: Session=Depends(settings.getConnectionDB)):
+async def process_data_url(request: Request, scraping: Scrape = Body(...), session: Session=Depends(settings.getConnectionDB())):
     return await model.processing_data(scraping.title, scraping.content, request.state.user['id'], session= session)
 

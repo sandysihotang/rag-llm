@@ -4,7 +4,7 @@
 import os
 import re
 
-from exceptiongroup import catch
+from sqlalchemy.orm import Session
 from openai import OpenAI
 import pandas as pd
 from tqdm import tqdm 
@@ -25,7 +25,7 @@ class DocumentService:
         self.nlp = English()
         self.nlp.add_pipe('sentencizer')
         self.openAI = OpenAI(api_key=settings.getAISettings().getApiKey())
-        self.session = settings.getConnectionDB()
+        self.session = settings.getConnectionDB
         self.api_key = settings.getAISettings().getApiKey()
         pass
     def open_and_read_pdf(self, pdf_path: str) -> list[dict]:
@@ -41,7 +41,7 @@ class DocumentService:
                                   "text": text})
         return page_and_text
     
-    def process_file_pdf(self, filedata:Files, min_token_length=30,num_sentence_chunk_size=10):
+    def process_file_pdf(self, filedata:Files, session: Session, min_token_length=30,num_sentence_chunk_size=10):
         filepath = os.path.join(self.file_upload_dir,filedata.file_name)
         try:
             pages_and_text = self.open_and_read_pdf(pdf_path = filepath)
@@ -92,38 +92,38 @@ class DocumentService:
             new_data.embedding_data = item['embedding']
             new_datas.append(new_data)
         try:    
-            data_embedding.insert_data_embedding(self.session, new_datas)
+            data_embedding.insert_data_embedding(session, new_datas)
         except Exception as e:
-            raise
+            raise e
         
-    def process_files(self):
-        files_data = FilesRepository.get_data_source(self.session)
+    def process_files(self, session: Session):
+        files_data = FilesRepository.get_data_source(session=session)
         if len(files_data) == 0:
             print("No data need to process")
             return
         for data in files_data:
             try:
                 if data.type_data == 1:
-                    self.process_file_pdf(filedata=data)
+                    self.process_file_pdf(filedata=data, session= session)
                 else:
                     self.process_file_txt(data)
             except Exception as e:
-                self.session.rollback()
-                raise 
+                session.rollback()
+                raise e
             
             try:
-                FilesRepository.update_status_file(self.session, data.id)
+                FilesRepository.update_status_file(session, data.id)
             except Exception as e:
-                self.session.rollback()
-                raise 
+                session.rollback()
+                raise e
             
             try:
                 os.remove(path=os.path.join(self.file_upload_dir,data.file_name))  # Delete the file
             except Exception as e:
-                self.session.rollback()
+                session.rollback()
                 print(f"Error occurred while deleting the file: {e}")
-                raise
-        self.session.commit()
+                raise e
+        session.commit()
         
     def getVectorData(self, data: str):
         dataEmbedding = self.openAI.embeddings.create(

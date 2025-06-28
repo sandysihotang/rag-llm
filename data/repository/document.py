@@ -1,6 +1,5 @@
 
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy import asc, desc, select, update
 from models.files_model import Files
 

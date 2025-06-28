@@ -68,7 +68,12 @@ class RagModel():
         return dataEmbedding.data[0].embedding
 
     def prompt_formatter(self, query: str, history_chat:list ,context_items):
-        context = '- ' + '\n- '.join([item['sentence_chunk'] for item in context_items])
+        context = ''
+        for item in context_items:
+            pages = ''
+            if item['page_number'] != 0:
+                pages += f", Page: {item['page_number']+1}"
+            context += '- ' + f'Document: {item["source_file"]}' + pages + f', Context: {item["sentence_chunk"]}\n'        
         base_prompt = """
             # Role and Purpose
             You are an AI assistant designed to assist the user. Your task is to synthesize a coherent and helpful answer based on the given question and the relevant context retrieved from a knowledge database.
@@ -83,6 +88,7 @@ class RagModel():
             7. Maintain a helpful, professional, and polite tone throughout your response.
             8. Ensure your response is helpful, staying faithful to the provided information without speculating.
             9. If the query language submitted is different from the document provided, respond in the same language as the query.
+            10. When referencing the provided document and page (if available), give the answer with the document and page number from the context, and write your the document and pages at the bottom.
 
             Remember: Your goal is to be as helpful as possible while strictly adhering to the provided context and history.
 
@@ -91,7 +97,7 @@ class RagModel():
         
         history_chat.append({
             'role': 'user',
-            'content': f'Context: {context}, Question: {query}'
+            'content': f'All Context: {context}, Question: {query}'
         })
         history_chat.append({
             'role': 'system',
