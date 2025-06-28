@@ -13,15 +13,9 @@ class FilesRepository():
             session.add(data)
             session.flush()
             return data.id
-        except IntegrityError as e:
-            print(f"Integrity error: {e}")
-            session.rollback()  
-        except SQLAlchemyError as e:
-            print(f"SQLAlchemy error: {e}")
-            session.rollback()
         except Exception as e:
             print(f"An error occurred: {e}")
-            session.rollback()
+            raise e
             
             
     @staticmethod

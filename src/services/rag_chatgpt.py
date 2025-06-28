@@ -16,7 +16,7 @@ from data.repository.document import FilesRepository
 from fastapi import HTTPException, status
 from models.chat_history import ChatHistory
 from models.files_model import Files
-from src.services.request import FilesRequest
+from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import DeclarativeMeta
 
 MODEL = "text-embedding-ada-002"
@@ -46,11 +46,6 @@ class RagModel():
         self.api_key = settings.getAISettings().getApiKey()
         # self.publiser = settings.getNSQConnection()
         
-    # def test_nsq(self):
-    #     loop = asyncio.new_event_loop()
-    #     asyncio.set_event_loop(loop)
-    #     message = "Hello, this is a test message from NSQ Publisher!"
-    #     loop.run_until_complete(self.publish_message(message=message))
         
     async def publish_message(self, message:str):
         try:
@@ -104,9 +99,9 @@ class RagModel():
         })
         return history_chat
 
-    def get_history_message(self, user_id: int):
+    def get_history_message(self, user_id: int, session:Session):
         try: 
-            history_message = ChatHistoryRepository.get_history_message(self.session,user_id=user_id)
+            history_message = ChatHistoryRepository.get_history_message(session,user_id=user_id)
             data = [history.to_dict() for history in history_message]
             return JSONResponse(status_code=200, content=data)
         except Exception as e:
@@ -127,20 +122,20 @@ class RagModel():
                     'content': f'{item.messages}\n\n{context_if_exist}'
                 })
         return history_chats
-    def ask(self,query,user_id: int, format_answer_text=True,return_answer_only=True):
+    def ask(self,query,user_id: int, session: Session, format_answer_text=True,return_answer_only=True):
         embedding = self.getVectorData(query)
         
-        similarity_data = data_embedding.search_data_embedding(self.session,embedding, user_id=user_id)
+        similarity_data = data_embedding.search_data_embedding(session,embedding, user_id=user_id)
         if len(similarity_data) == 0:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User never upload the context")
-        chat_history_context = ChatHistoryRepository.get_history_message_for_context(self.session, user_id=user_id)
+        chat_history_context = ChatHistoryRepository.get_history_message_for_context(session, user_id=user_id)
         prompt_history_messsage = self.generate_history_message(history_chat=chat_history_context)
         prompt= self.prompt_formatter(query=query, history_chat=prompt_history_messsage ,context_items=similarity_data)
         try:
             new_chat_user = ChatHistory(user_id=user_id, messages= query, messages_from= 1, create_time=datetime.now())
-            ChatHistoryRepository.insert_new_chat(self.session, new_chat_user)
+            ChatHistoryRepository.insert_new_chat(session, new_chat_user)
         except Exception as e:
-            self.session.rollback()
+            session.rollback()
             raise e
         self.chat_gpt_client = OpenAI(api_key=self.api_key)
 
@@ -169,15 +164,15 @@ class RagModel():
             
         try:
             new_chat_bot = ChatHistory(user_id=user_id, messages= output_text, messages_from= 2, reference= reference, create_time=datetime.now(), context_answer= '- ' + '\n- '.join([item['sentence_chunk'] for item in similarity_data]))
-            data = ChatHistoryRepository.insert_new_chat(self.session, new_chat_bot)
+            data = ChatHistoryRepository.insert_new_chat(session, new_chat_bot)
         except Exception as e:
-            self.session.rollback()
+            session.rollback()
             raise e
         
-        self.session.commit()
+        session.commit()
         return data.to_dict()
 
-    async def processing_file(self, original_file_name: str, content, user_id: int):
+    async def processing_file(self, original_file_name: str, content, user_id: int, session:Session):
         if self.allowed_file(filename= original_file_name):
             filename = self.get_new_file_name()
             save_path = f'./uploads/{filename}.pdf'
@@ -186,13 +181,13 @@ class RagModel():
                 f.write(content)
             
             new_files = Files(user_id = user_id, file_name=f'{filename}.pdf', original_file_name= original_file_name, status = 1, type_data=1)
-            FilesRepository.insert_data_document(self.session, new_files)
+            FilesRepository.insert_data_document(session, new_files)
             
-            self.session.commit()
+            session.commit()
             
             return JSONResponse(status_code=200, content=f'file {filename} uploaded succesfully')
         else:
-            self.session.rollback()
+            session.rollback()
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='File type not allowed')
     
     def allowed_file(self, filename):
@@ -220,15 +215,15 @@ class RagModel():
         except Exception as e:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=e)
         
-    async def get_source(self, user_id: int):
+    async def get_source(self, user_id: int, session:Session):
         try: 
-            all_data = FilesRepository.get_source_data_by_user_id(self.session, user_id)
+            all_data = FilesRepository.get_source_data_by_user_id(session, user_id)
             data = [file.to_dict() for file in all_data]
             return JSONResponse(status_code=200, content=data)
         except Exception as e:
             raise HTTPException(status_code=400, detail=e)
         
-    async def processing_data(self, title: str, content: str, user_id: int):
+    async def processing_data(self, title: str, content: str, user_id: int, session: Session):
         content = content.replace('\n', " ").strip()
         cleaned_text = re.sub(r'\s+', ' ', content).strip()
         filename = self.get_new_file_name()
@@ -236,13 +231,9 @@ class RagModel():
             f.write(cleaned_text)
         new_files = Files(user_id = user_id, file_name=f'{filename}.txt', original_file_name= title, status = 1, type_data=2)
         try:
-            new_id = FilesRepository.insert_data_document(self.session, new_files)
-            self.session.commit()
-            files_req = FilesRequest(id=new_id)
-            message = files_req.to_json().encode('utf-8')
-            await self.publish_message(message=message)
-            
+            FilesRepository.insert_data_document(session, new_files)
+            session.commit()
             return JSONResponse(status_code=200, content=f'{title} Processing')
         except Exception as e:
-            self.session.rollback()
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail= f'e')
+            session.rollback()
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail= e)

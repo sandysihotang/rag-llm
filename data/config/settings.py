@@ -44,10 +44,13 @@ class OpenConnectionDB():
         
     def ConnectDB(self):
         self.URL = os.getenv(key=Const().DB_URL)
-        conn = create_engine(self.URL)
+        conn = create_engine(self.URL, echo=True)
         session = sessionmaker(autocommit= False, autoflush = False, bind=conn)
         db = session()
-        return db
+        try:
+           yield db
+        finally:
+            db.close()
     
 # class PubliserNSQ():
 #     def __init__(self) -> None:

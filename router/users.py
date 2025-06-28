@@ -2,6 +2,8 @@ from fastapi import Body, APIRouter, HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
 from fastapi.security import HTTPBearer,HTTPBasic
+from sqlalchemy.orm import Session
+from fastapi import Depends
 from datetime import datetime, timedelta
 import jwt 
 import os
@@ -32,9 +34,9 @@ def generate_token(id: int):
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 @router.post("/login")
-def login(user:User = Body(...)): 
+def login(user:User = Body(...), session: Session = Depends(settings.getConnectionDB)): 
     try:
-        is_valid, user_id = user_service.get_user(email=user.email, password=user.password)
+        is_valid, user_id = user_service.get_user(email=user.email, password=user.password, session=session)
         if(is_valid == False):
             raise HTTPException(status_code=400, detail="Incorrect credentials")
         token = generate_token(user_id)
@@ -44,9 +46,9 @@ def login(user:User = Body(...)):
         raise HTTPException(status_code=400, detail="Authorization user Failed")
 
 @router.post("/register")
-def register(user:User = Body(...)):
+def register(user:User = Body(...), session: Session = Depends(settings.getConnectionDB)):
     try:
-        new_user = user_service.register_user(email=user.email, password=user.password)
+        new_user = user_service.register_user(email=user.email, password=user.password, session= session)
         token = generate_token(new_user.id)
         content = {'token': token}
         return JSONResponse(content=content, status_code=status.HTTP_201_CREATED)
