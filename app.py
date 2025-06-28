@@ -1,8 +1,7 @@
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from flask import session
-from requests import Session
+
 import uvicorn
 from router import chat, users
 from router.middleware.middleware import JWTAuthMiddleware
