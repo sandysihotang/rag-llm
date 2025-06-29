@@ -47,6 +47,8 @@ services:
     depends_on:
       - nsqlookupd
       - nsq
+    networks:
+      - nsq-network
   nsq:
     build:
       context: .
@@ -59,6 +61,8 @@ services:
       - nsqd
     volumes:
       - uploads:/uploads
+    networks:
+      - nsq-network
 
 volumes:
   uploads:
