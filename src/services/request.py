@@ -3,7 +3,7 @@ class FilesRequest:
     def __init__(self, id:int) -> None:
         self.id = id
     def to_json(self):
-        return json.dumps(self.__dict__)
+        return json.dumps({'id': self.id})
     
     @classmethod
     def from_json(cls, data: str):
@@ -16,7 +16,7 @@ class FilesRequest:
                 raise ValueError("Missing 'id' field in JSON data")
 
             # Return a new instance of FilesRequest with the 'id'
-            return cls(**json_data)
+            return cls(id=json_data['id'])
 
         except (json.JSONDecodeError, ValueError) as e:
             print(f"Error decoding JSON: {e}")

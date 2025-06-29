@@ -23,6 +23,11 @@ class FilesRepository():
         return data
     
     @staticmethod
+    def get_data_source_by_id(session: Session, id: int)->Files:
+        data = session.query(Files).where(Files.id == id).first()
+        return data
+    
+    @staticmethod
     def update_status_file(session: Session, id: int):
         session.query(Files).filter(Files.id == id).update({Files.status : 2}, synchronize_session=False)
         

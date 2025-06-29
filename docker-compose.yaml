@@ -1,15 +1,69 @@
 version: "3.8"
 services:
+  nsqlookupd:
+    container_name: nsqlookupd
+    command: /nsqlookupd
+    image: nsqio/nsq
+    ports:
+      - 4160:4160
+      - 4161:4161
+    networks:
+      - nsq-network
+  nsqd:
+    container_name: nsqd
+    command: /nsqd --broadcast-address=nsqd --lookupd-tcp-address=nsqlookupd:4160
+    depends_on:
+      - nsqlookupd
+    image: nsqio/nsq:latest
+    ports:
+      - 4150:4150
+      - 4151:4151
+    networks:
+      - nsq-network
+        #Don’t forget to add nsqd as 127.0.0.1 at your /etc/hosts
+  nsqadmin:
+    container_name: nsqadmin
+    command: /nsqadmin --lookupd-http-address=nsqlookupd:4161
+    depends_on:
+      - nsqlookupd
+    image: nsqio/nsq
+    ports:
+      - 4171:4171
+    networks:
+      - nsq-network  
+        
   fastapi-app:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile.fastapi
     container_name: fastapi-app
     ports:
       - "8000:8000"  # Map port 8000 from the container to port 8000 on the host
     environment:
       - PYTHONPATH=/app
-      - DATABASE_URL=postgresql://postgres:password@timescaledb:5432/postgres
     volumes:
       - .:/app  # Mount the current directory to the container's /app directory
+      - uploads:/uploads
+    depends_on:
+      - nsqlookupd
+      - nsq
+  nsq:
+    build:
+      context: .
+      dockerfile: Dockerfile.nsq
+    environment:
+      - NSQD_ADDRESS=nsqd:4150
+      - LOOKUPD_ADDRESS=nsqlookupd:4161
+    depends_on:
+      - nsqlookupd
+      - nsqd
+    volumes:
+      - uploads:/uploads
 
 volumes:
-  timescaledb_data:
+  uploads:
+    driver: local
+
+networks:
+  nsq-network:
+    driver: bridge

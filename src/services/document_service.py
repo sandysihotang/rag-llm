@@ -20,7 +20,7 @@ from models.files_model import Files
 MODEL = "text-embedding-ada-002"
 
 class DocumentService:
-    def __init__(self,settings: Settings, file_upload_dir="uploads"):
+    def __init__(self,settings: Settings, file_upload_dir="/uploads"):
         self.file_upload_dir = file_upload_dir
         self.nlp = English()
         self.nlp.add_pipe('sentencizer')
@@ -123,6 +123,35 @@ class DocumentService:
                 session.rollback()
                 print(f"Error occurred while deleting the file: {e}")
                 raise e
+        session.commit()
+        
+    def process_files_by_id(self, session: Session, id:int):
+        data = FilesRepository.get_data_source_by_id(session=session, id=id)
+        if data.status == 2:
+            print("No data need to process")
+            return
+        
+        try:
+            if data.type_data == 1:
+                self.process_file_pdf(filedata=data, session= session)
+            else:
+                self.process_file_txt(data)
+        except Exception as e:
+            session.rollback()
+            raise e
+        
+        try:
+            FilesRepository.update_status_file(session, data.id)
+        except Exception as e:
+            session.rollback()
+            raise e
+        
+        try:
+            os.remove(path=os.path.join(self.file_upload_dir,data.file_name))  # Delete the file
+        except Exception as e:
+            session.rollback()
+            print(f"Error occurred while deleting the file: {e}")
+            raise e
         session.commit()
         
     def getVectorData(self, data: str):

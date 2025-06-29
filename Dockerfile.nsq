@@ -1,0 +1,16 @@
+FROM python:3.10.17-slim
+
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /rag-llm
+
+
+COPY . /rag-llm
+
+COPY requirements.txt /rag-llm/.
+COPY .env /rag-llm/.env
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+
+CMD ["python", "app_worker.py"]

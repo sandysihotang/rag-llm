@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 from fastapi.responses import JSONResponse
 # from nsq import Error
 import os
+from nsq import Error
 from openai import OpenAI
 import requests
 from data.config.settings import Settings
@@ -18,6 +19,8 @@ from models.chat_history import ChatHistory
 from models.files_model import Files
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import DeclarativeMeta
+
+from src.services.request import FilesRequest
 
 MODEL = "text-embedding-ada-002"
 
@@ -44,7 +47,7 @@ class RagModel():
         self.openAI = OpenAI(api_key=settings.getAISettings().getApiKey())
         self.session = settings.getConnectionDB()
         self.api_key = settings.getAISettings().getApiKey()
-        # self.publiser = settings.getNSQConnection()
+        self.publiser = settings.getNSQConnection()
         
         
     async def publish_message(self, message:str):
@@ -180,17 +183,20 @@ class RagModel():
     async def processing_file(self, original_file_name: str, content, user_id: int, session:Session):
         if self.allowed_file(filename= original_file_name):
             filename = self.get_new_file_name()
-            save_path = f'./uploads/{filename}.pdf'
+            save_path = f'/uploads/{filename}.pdf'
             os.makedirs(os.path.dirname(save_path), exist_ok=True)
             with open(save_path, "wb") as f:
                 f.write(content)
             
             new_files = Files(user_id = user_id, file_name=f'{filename}.pdf', original_file_name= original_file_name, status = 1, type_data=1)
-            FilesRepository.insert_data_document(session, new_files)
-            
-            session.commit()
-            
-            return JSONResponse(status_code=200, content=f'file {filename} uploaded succesfully')
+            try:
+                id = FilesRepository.insert_data_document(session, new_files)
+                session.commit()
+                await self.publish_message(FilesRequest(id=id).to_json().encode())
+                return JSONResponse(status_code=200, content=f'file {filename} uploaded succesfully')
+            except Exception as e:
+                session.rollback()
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e)
         else:
             session.rollback()
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='File type not allowed')
