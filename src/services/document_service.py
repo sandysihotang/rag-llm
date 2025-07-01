@@ -135,7 +135,7 @@ class DocumentService:
             if data.type_data == 1:
                 self.process_file_pdf(filedata=data, session= session)
             else:
-                self.process_file_txt(data)
+                self.process_file_txt(filedata=data, session=session)
         except Exception as e:
             session.rollback()
             raise e
@@ -165,7 +165,7 @@ class DocumentService:
     def split_list(self, input_list:list[str], slice_size:int=10):
         return [input_list[i:i+slice_size] for i in range (0, len(input_list), slice_size)]
     
-    def process_file_txt(self, filedata:Files, min_token_length=30,num_sentence_chunk_size=10):
+    def process_file_txt(self, filedata:Files,session: Session, min_token_length=30,num_sentence_chunk_size=10):
         filepath = os.path.join(self.file_upload_dir,filedata.file_name)
         with open(filepath,'r') as f:
             content = f.read()
@@ -213,6 +213,7 @@ class DocumentService:
             new_data.embedding_data = item['embedding']
             new_datas.append(new_data)
         try:    
-            data_embedding.insert_data_embedding(self.session, new_datas)
+            data_embedding.insert_data_embedding(session, new_datas)
         except Exception as e:
+            print(f"Error occured: {e}")
             raise

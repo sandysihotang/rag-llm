@@ -11,7 +11,6 @@ class data_embedding():
             session.add_all(data)
         except Exception as e:
             print(f"An error occurred: {e}")
-            session.rollback()
             raise
     
     @staticmethod
