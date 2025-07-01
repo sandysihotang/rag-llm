@@ -76,9 +76,8 @@ class HandlerNSQ():
         reader = nsq.Reader(topic='my_topic', 
                             channel='my_channel', 
                             nsqd_tcp_addresses=[os.getenv(key=Const().NSQ_READER)],
-                            lookupd_http_addresses=[os.getenv('NSQ_LOOKUPD')],
                             message_handler=handler, 
-                            max_in_flight=10,)
+                            max_in_flight=10)
         nsq.run()
     
 
