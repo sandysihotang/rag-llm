@@ -32,6 +32,5 @@ class data_embedding():
             # Zip column names with the tuple values and convert to a dictionary
             item_dict = dict(zip(column_names, item))
             datas.append(item_dict)
-        session.close()
         return datas
         

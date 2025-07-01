@@ -242,8 +242,9 @@ class RagModel():
             f.write(cleaned_text)
         new_files = Files(user_id = user_id, file_name=f'{filename}.txt', original_file_name= title, status = 1, type_data=2)
         try:
-            FilesRepository.insert_data_document(session, new_files)
+            id = FilesRepository.insert_data_document(session, new_files)
             session.commit()
+            await self.publish_message(FilesRequest(id=id).to_json().encode())
             return JSONResponse(status_code=200, content=f'{title} Processing')
         except Exception as e:
             session.rollback()
