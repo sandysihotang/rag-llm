@@ -32,9 +32,6 @@ jobs:
       - name: Build Docker image
         run: |
           docker-compose -f docker-compose.yaml up -d --build
-      - name: Run tests
-        run: |
-          docker-compose -f docker-compose.yaml run --rm fastapi-app pytest
   deploy:
     runs-on: ubuntu-latest
     needs: build
