@@ -47,7 +47,7 @@ jobs:
 
     - name: Deploy to server via SSH
       run: |
-        ssh -o StrictHostKeyChecking=no root@47.84.71.54 << 'EOF'
+        sshpass -p "${{ secrets.PASSWORD_SSH }}" ssh -o StrictHostKeyChecking=no root@47.84.71.54 << 'EOF'
           cd /rag-llm  # Navigate to your project directory on the server
           git pull origin main  # Pull the latest code from GitHub repository
           docker-compose -f docker-compose.yaml up -d --build  # Rebuild and restart your Docker container
