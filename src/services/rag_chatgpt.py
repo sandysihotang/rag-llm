@@ -238,7 +238,7 @@ class RagModel():
         content = content.replace('\n', " ").strip()
         cleaned_text = re.sub(r'\s+', ' ', content).strip()
         filename = self.get_new_file_name()
-        with open(os.path.join("/uploads",f"{filename}.txt"), 'w') as f:
+        with open(os.path.join("uploads",f"{filename}.txt"), 'w') as f:
             f.write(cleaned_text)
         new_files = Files(user_id = user_id, file_name=f'{filename}.txt', original_file_name= title, status = 1, type_data=2)
         try:

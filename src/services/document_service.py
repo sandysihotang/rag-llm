@@ -20,7 +20,7 @@ from models.files_model import Files
 MODEL = "text-embedding-ada-002"
 
 class DocumentService:
-    def __init__(self,settings: Settings, file_upload_dir="/uploads"):
+    def __init__(self,settings: Settings, file_upload_dir="uploads"):
         self.file_upload_dir = file_upload_dir
         self.nlp = English()
         self.nlp.add_pipe('sentencizer')

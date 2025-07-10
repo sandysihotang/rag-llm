@@ -32,37 +32,37 @@ services:
     networks:
       - nsq-network  
         
-  fastapi-app:
-    build: 
-      context: .
-      dockerfile: Dockerfile.fastapi
-    container_name: fastapi-app
-    ports:
-      - "8000:8000"  # Map port 8000 from the container to port 8000 on the host
-    environment:
-      - PYTHONPATH=/app
-    volumes:
-      - .:/app  # Mount the current directory to the container's /app directory
-      - uploads:/uploads
-    depends_on:
-      - nsqlookupd
-      - nsq
-    networks:
-      - nsq-network
-  nsq:
-    build:
-      context: .
-      dockerfile: Dockerfile.nsq
-    environment:
-      - NSQD_ADDRESS=nsqd:4150
-      - LOOKUPD_ADDRESS=nsqlookupd:4161
-    depends_on:
-      - nsqlookupd
-      - nsqd
-    volumes:
-      - uploads:/uploads
-    networks:
-      - nsq-network
+  # fastapi-app:
+  #   build: 
+  #     context: .
+  #     dockerfile: Dockerfile.fastapi
+  #   container_name: fastapi-app
+  #   ports:
+  #     - "8000:8000"  # Map port 8000 from the container to port 8000 on the host
+  #   environment:
+  #     - PYTHONPATH=/app
+  #   volumes:
+  #     - .:/app  # Mount the current directory to the container's /app directory
+  #     - uploads:/uploads
+  #   depends_on:
+  #     - nsqlookupd
+  #     - nsq
+  #   networks:
+  #     - nsq-network
+  # nsq:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.nsq
+  #   environment:
+  #     - NSQD_ADDRESS=nsqd:4150
+  #     - LOOKUPD_ADDRESS=nsqlookupd:4161
+  #   depends_on:
+  #     - nsqlookupd
+  #     - nsqd
+  #   volumes:
+  #     - uploads:/uploads
+  #   networks:
+  #     - nsq-network
 
 volumes:
   uploads:
