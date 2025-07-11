@@ -38,6 +38,7 @@ services:
       context: .
       dockerfile: Dockerfile.fastapi
     container_name: fastapi-app
+    image: sandysihotang123/rag-llm:latest
     ports:
       - "8000:8000"  # Map port 8000 from the container to port 8000 on the host
     environment:
