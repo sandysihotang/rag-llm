@@ -13,7 +13,7 @@ settings = Settings()
 model = RagModel(settings=settings)
 router = APIRouter()
 
-upload_folder = 'uploads'
+upload_folder = '/uploads'
 if not(os.path.exists(upload_folder)):
     os.mkdir(upload_folder)
 

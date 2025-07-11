@@ -41,7 +41,7 @@ class AlchemyEncoder(json.JSONEncoder):
 
 
 class RagModel():
-    def __init__(self, settings: Settings, file_upload_dir="uploads"):
+    def __init__(self, settings: Settings, file_upload_dir="/uploads"):
         self.file_upload_dir = file_upload_dir
         self.allowed_files = {'pdf'}
         self.openAI = OpenAI(api_key=settings.getAISettings().getApiKey())
@@ -238,7 +238,7 @@ class RagModel():
         content = content.replace('\n', " ").strip()
         cleaned_text = re.sub(r'\s+', ' ', content).strip()
         filename = self.get_new_file_name()
-        with open(os.path.join("uploads",f"{filename}.txt"), 'w') as f:
+        with open(os.path.join("/uploads",f"{filename}.txt"), 'w') as f:
             f.write(cleaned_text)
         new_files = Files(user_id = user_id, file_name=f'{filename}.txt', original_file_name= title, status = 1, type_data=2)
         try:

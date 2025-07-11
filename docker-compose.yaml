@@ -51,10 +51,10 @@ services:
       - nsq
     networks:
       - nsq-network
-  nsq:
+  worker:
     build:
       context: .
-      dockerfile: Dockerfile.nsq
+      dockerfile: Dockerfile.worker
     image: sandysihotang123/worker:latest
     environment:
       - NSQD_ADDRESS=nsqd:4150
