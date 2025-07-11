@@ -1,14 +1,5 @@
 version: "3.8"
 services:
-  web:
-    build:
-      context: .
-    image: sandysihotang123/rag-llm:latest
-    ports:
-      - "8001:8001"
-    environment:
-      - ENV=production
-    restart: always
 
   nsqlookupd:
     container_name: nsqlookupd
