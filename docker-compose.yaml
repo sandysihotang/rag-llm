@@ -48,13 +48,13 @@ services:
       - uploads:/uploads
     depends_on:
       - nsqlookupd
-      - nsq
+      - nsqd
     networks:
       - nsq-network
   worker:
     build:
       context: .
-      dockerfile: Dockerfile.worker
+      dockerfile: Dockerfile.nsq
     image: sandysihotang123/worker:latest
     environment:
       - NSQD_ADDRESS=nsqd:4150
