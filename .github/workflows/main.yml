@@ -61,7 +61,5 @@ jobs:
           git pull origin main  # Pull the latest code from GitHub repository
           docker-compose -f docker-compose.yaml pull
           docker-compose -f docker-compose.yaml up -d
-          sudo systemctl restart fastapi
-          sudo systemctl restart worker
         EOF
   
