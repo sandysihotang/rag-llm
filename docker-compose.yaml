@@ -55,6 +55,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.nsq
+    image: sandysihotang123/worker:latest
     environment:
       - NSQD_ADDRESS=nsqd:4150
       - LOOKUPD_ADDRESS=nsqlookupd:4161
