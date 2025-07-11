@@ -36,11 +36,11 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker-compose -f docker-compose.yml build
+          docker-compose -f docker-compose.yaml build
 
       - name: Push Docker image to Docker Hub
         run: |
-          docker-compose -f docker-compose.yml push
+          docker-compose -f docker-compose.yaml push
   deploy:
     runs-on: ubuntu-latest
     needs: build
@@ -59,8 +59,8 @@ jobs:
         sshpass -p "${{ secrets.PASSWORD_SSH }}" ssh -o StrictHostKeyChecking=no root@47.84.71.54 << 'EOF'
           cd rag-llm  # Navigate to your project directory on the server
           git pull origin main  # Pull the latest code from GitHub repository
-          docker-compose -f docker-compose.yml pull
-          docker-compose -f docker-compose.yml up -d
+          docker-compose -f docker-compose.yaml pull
+          docker-compose -f docker-compose.yaml up -d
           sudo systemctl restart fastapi
           sudo systemctl restart worker
         EOF
