@@ -58,7 +58,7 @@ jobs:
       run: |
         sshpass -p "${{ secrets.PASSWORD_SSH }}" ssh -o StrictHostKeyChecking=no root@47.84.71.54 << 'EOF'
           cd rag-llm  # Navigate to your project directory on the server
-          git pull origin main  # Pull the latest code from GitHub repository
+          docker-compose down
           docker-compose -f docker-compose.yaml pull
           docker-compose -f docker-compose.yaml up -d
         EOF
