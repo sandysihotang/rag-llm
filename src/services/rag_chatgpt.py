@@ -90,7 +90,7 @@ class RagModel():
             6. If the question has related previous content, incorporate it into the current answer for completeness.
             7. Maintain a helpful, professional, and polite tone throughout your response.
             8. Ensure your response is helpful, staying faithful to the provided information without speculating.
-            9. When referencing the provided document and page (if available), give the answer with the document and page number from the context, and write your the document and pages at the bottom, don't provide redundant information context like document and page numbers.
+            9. When referencing the provided document and page (if available), provide the answer with the document and page number from the context, and write the document and page numbers at the bottom if the answer is taken from the context. Do not include document and page numbers if the answer is not from the context, and avoid providing redundant information such as document and page numbers.
 
             Remember: Your goal is to be as helpful as possible while strictly adhering to the provided context and history.
 
